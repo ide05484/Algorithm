@@ -37,8 +37,13 @@ public class Main {
 		visit = new boolean[R][C]; // 방문체크체크
 		list = new HashSet<>(); // 방문한 길 넣어줄 것
 		// 0,0부터 시작해서 같은 알파벳이 적힌 칸을 두 번 지날 수 없도록 체크해줘야해
+		
+		visit[0][0] = true;
+		list.add(board[0][0]);
+		
 		maxCnt = 0;
 		DFS(0, 0, 1);
+
 
 		System.out.println(maxCnt);
 	}
@@ -46,13 +51,20 @@ public class Main {
 	private static void DFS(int r, int c, int count) {
 
 //		if (!check(r, c)) { // 만약 더이상 갈 수 있는 곳이 없다면 멈춰줘
+		
 		maxCnt = Math.max(maxCnt, count);
+		
+		if(maxCnt == 26) {
+			System.out.println(26);
+			System.exit(0);
+		}
 //			return;
 //		}
 
-		visit[r][c] = true;
+//		visit[r][c] = true;
 		// 해당 자리를 어디 넣어줘야해
-		list.add(board[r][c]); // 보드 자리 글자를 넣어줘
+		
+//		System.out.println(r + " " + c);
 
 		// 더 이상 갈 수 있는 곳이 있다면 가자가자
 		for (int d = 0; d < 4; d++) {
@@ -60,15 +72,19 @@ public class Main {
 			int nc = c + dc[d];
 			if (nr < 0 || nc < 0 || nr >= R || nc >= C)
 				continue;
-			
+
+//			System.out.println(nr+" "+nc+" "+check(nr, nc));
 			if (!visit[nr][nc] && !check(nr, nc)) {
 				// 범위 안이고, 방문하지 않았다면 가자
+				visit[nr][nc] = true;
+				list.add(board[nr][nc]); // 보드 자리 글자를 넣어줘
+//				System.out.println(Arrays.toString(list.toArray()));
 				DFS(nr, nc, count + 1);
+				visit[nr][nc] = false; // 여기에 온다는 것은 DFS를 다 돌고 뒤로 돌아가겠다는 뜻...
+				list.remove(board[nr][nc]);
 			}
 		}
 
-		visit[r][c] = false; // 여기에 온다는 것은 DFS를 다 돌고 뒤로 돌아가겠다는 뜻...
-		list.remove(board[r][c]);
 	}
 
 	private static boolean check(int r, int c) {
