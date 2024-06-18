@@ -21,7 +21,7 @@ class Solution {
 				max[maxIdx] = curr;
 				maxIdx++;
 			} else {
-				k--; //위의 while에서 k가 바뀌지 않은 건 지금들어올 숫자는 어디에도 들어갈 수 없다는 뜻임방구
+				k--; //위의 while에서 k가 바뀌지 않은 건 지금들어올 숫자는 어디에도 들어갈 수 없다는 뜻임
 			}
 
 //			System.out.println(Arrays.toString(max));
