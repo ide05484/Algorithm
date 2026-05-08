@@ -2,91 +2,114 @@ import java.util.*;
 import java.io.*;
 
 class Solution {
-    static class Now {
+    
+    static int[] dr = {1, -1, 0, 0};
+    static int[] dc = {0, 0, 1, -1};
+    static int startR = 0;
+    static int startC = 0;
+    static int laverR = 0;
+    static int laverC = 0;
+    static int endR = 0;
+    static int endC = 0;
+    
+    class Point {
         int r;
         int c;
-        int dist;
+        int time;
         
-        public Now(int r, int c, int dist) {
+        public Point(int r, int c, int time) {
             this.r = r;
             this.c = c;
-            this.dist = dist;
+            this.time = time;
         }
     }
-    
-    static int[] dr = {1, 0, -1, 0};
-    static int[] dc = {0, 1, 0, -1};
-    static char[][] board;
-    static int R, C;
-    static int answer;
         
     public int solution(String[] maps) {
         
-        R = maps.length;
-        C = maps[0].length();
+        char[][] miro = new char[maps.length][maps[0].length()];
         
-        board = new char[R][C];
-        
-        int startR = 0;
-        int startC = 0;
-        int laverR = 0;
-        int laverC = 0;
-        int exitR = 0;
-        int exitC = 0;
-        
-        for(int r = 0; r < R; r++) {
-            String str = maps[r];
-            for(int c = 0; c < C; c++) {
-                board[r][c] = str.charAt(c);
-                if(board[r][c] == 'S') {
+        for(int r = 0; r<maps.length; r++) {
+            for(int c = 0; c < maps[0].length(); c++) {
+                miro[r][c] = maps[r].charAt(c);
+                
+                if(miro[r][c] == 'S') {
                     startR = r;
                     startC = c;
-                } else if(board[r][c] == 'L') {
+                }
+                
+                if(miro[r][c] == 'L') {
                     laverR = r;
                     laverC = c;
-                } else if(board[r][c] == 'E') {
-                    exitR = r;
-                    exitC = c;
+                }
+                
+                if(miro[r][c] == 'E') {
+                    endR = r;
+                    endC = c;
                 }
             }
         }
         
-        answer = 0;
-        
-        bfs(startR, startC, laverR, laverC);
-        if(answer == -1) return answer;
-        
-        bfs(laverR, laverC, exitR, exitC);
-
-        return answer;
+                    
+        return bfs(miro);
     }
     
-    public static void bfs(int startR, int startC, int endR, int endC) {
-        Queue<Now> queue = new LinkedList<>();
-        boolean[][] visit = new boolean[R][C];
+    public int bfs(char[][] miro) {
+        int N = miro.length;
+        int M = miro[0].length;
         
-        queue.add(new Now(startR, startC, 0));
-        visit[startR][startC] = true;
+        boolean[][] visitA = new boolean[N][M];
         
-        while(!queue.isEmpty()){
-            Now now = queue.poll();
+        Queue<Point> qA = new LinkedList<>();
+        qA.add(new Point(startR, startC, 0));
+        visitA[startR][startC] = true;
+        int tmpdist = 0;
+        
+        while(!qA.isEmpty()) {
+            Point now = qA.poll();
             
-            if(now.r == endR && now.c == endC) {
-                answer += now.dist;
-                return;
+            if(now.r == laverR && now.c == laverC) {
+                tmpdist = now.time;
+                break;
             }
             
             for(int d = 0; d < 4; d++) {
                 int nr = now.r + dr[d];
                 int nc = now.c + dc[d];
                 
-                if(nr < 0 || nr >= R || nc < 0 || nc >= C || visit[nr][nc] || board[nr][nc] == 'X') continue;
+                if(nr < 0 || nr >= N || nc < 0 || nc >= M || visitA[nr][nc] || miro[nr][nc] == 'X') continue;
                 
-                queue.add(new Now(nr, nc, now.dist + 1));
-                visit[nr][nc] = true;
+                qA.add(new Point(nr, nc, now.time+1));
+                visitA[nr][nc] = true;
             }
         }
         
-        answer = -1;
+        if(tmpdist == 0) return -1;
+        
+        boolean[][] visitB = new boolean[N][M];
+        
+        Queue<Point> qB = new LinkedList<>();
+        qB.add(new Point(laverR, laverC, tmpdist));
+        visitB[laverR][laverC] = true;
+        
+        while(!qB.isEmpty()) {
+            Point now = qB.poll();
+            
+            if(now.r == endR && now.c == endC) {
+                return now.time;
+            }
+            
+            for(int d = 0; d < 4; d++) {
+                int nr = now.r + dr[d];
+                int nc = now.c + dc[d];
+                
+                if(nr < 0 || nr >= N || nc < 0 || nc >= M || visitB[nr][nc] || miro[nr][nc] == 'X') continue;
+                
+                qB.add(new Point(nr, nc, now.time+1));
+                visitB[nr][nc] = true;
+            }
+        }
+        
+        return -1;
     }
+    
 }
